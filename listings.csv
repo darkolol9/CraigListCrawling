@@ -1,0 +1,10 @@
+Model,Brand,Price,Odometer,Paint color,Condition,Fuel,Transmission,Type
+2014,FIAT,$16590,6518,blue,good,gas,automatic,hatchback
+2016,Toyota,$25990,41834,red,good,gas,automatic,hatchback
+2015,Chrysler,$20990,17052,white,good,gas,other,sedan
+2013,Acura,$21590,54662,white,good,other,automatic,sedan
+2016,Hyundai,$20990,99478,blue,good,other,automatic,coupe
+2017,Volkswagen,$22990,31749,red,good,gas,automatic,sedan
+2016,Mercedes-Benz,$32590,12453,black,good,other,automatic,coupe
+2016,Ford,$23990,15655,blue,good,other,automatic,sedan
+2020,Chevrolet,$34990,20748,blue,good,gas,other,pickup
