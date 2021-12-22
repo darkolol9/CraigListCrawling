@@ -6,7 +6,8 @@ from bs4 import BeautifulSoup
 
 driver = webdriver.Chrome()
 
-url = 'https://kansascity.craigslist.org/search/sss?auto_bodytype=1&auto_bodytype=10&auto_bodytype=11&auto_bodytype=12&auto_bodytype=2&auto_bodytype=3&auto_bodytype=4&auto_bodytype=5&auto_bodytype=6&auto_bodytype=7&auto_bodytype=8&auto_bodytype=9&condition=40&condition=50&condition=60&lat=38.75752717346409&lon=-94.5347186248444&purveyor-input=all&search_distance=250&sort=date'
+url = 'https://scottsbluff.craigslist.org/search/sss?auto_bodytype=1&auto_bodytype=10&auto_bodytype=11&auto_bodytype=12&auto_bodytype=2&auto_bodytype=3&auto_bodytype=4&auto_bodytype=5&auto_bodytype=6&auto_bodytype=7&auto_bodytype=8&auto_bodytype=9&condition=40&condition=50&condition=60&lat=42.614756054437734&lon=-103.61247964307792&purveyor-input=all&search_distance=250&sort=date'
+
 driver.get(url)
 
 first_title = driver.find_element_by_class_name('result-heading')

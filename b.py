@@ -2,21 +2,22 @@
 import pandas as pd
 
 
-df = pd.read_csv('listings.csv')
+df = pd.read_csv('listings_no_dupe.csv')
 df = df.drop_duplicates()
+
+# df['Price'] = df['Price'].str.replace('$','').astype(int)
 df.shape
 
-df['Price'] = df['Price'].str.replace('$','').astype(int)
+# df.to_csv('listings_no_dupe.csv')
 
-
-df.tail()
+# df.tail()
 # %%
-# grp = df.groupby('Paint color').count()
-# grp.plot(kind='pie')
+grp = df['Fuel'].value_counts()
+grp.plot(kind='bar')
 
-colors = df.groupby('Transmission')['Model'].mean()
+# colors = df.groupby('Transmission')['Model'].mean()
 
-colors.plot(kind='bar')
+# colors.plot(kind='bar')
 
 
 
