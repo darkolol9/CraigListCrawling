@@ -3,16 +3,16 @@ import pandas as pd
 
 
 df = pd.read_csv('listings_no_dupe.csv')
-df = df.drop_duplicates()
+# df = df.drop_duplicates()
 
-# df['Price'] = df['Price'].str.replace('$','').astype(int)
+# df['Price'] = df['Price'].str.replace('$','').astype(float)
 df.shape
 
 # df.to_csv('listings_no_dupe.csv')
 
-# df.tail()
+df.tail()
 # %%
-grp = df['Fuel'].value_counts()
+grp = df['Brand'].value_counts()
 grp.plot(kind='bar')
 
 # colors = df.groupby('Transmission')['Model'].mean()
