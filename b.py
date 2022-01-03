@@ -2,6 +2,7 @@
 import pandas as pd
 
 
+# df = pd.read_csv('listings.csv')
 df = pd.read_csv('listings_no_dupe.csv')
 # df = df.drop_duplicates()
 
@@ -10,8 +11,32 @@ df.shape
 
 # df.to_csv('listings_no_dupe.csv')
 
-# df.tail()
-# %%
+df.tail()
+
+
+# %% 
+
+def isNumber(a):
+    return any(i.isdigit() for i in a)
+
+for i,row in enumerate(df['Brand']):
+    if isNumber(row):
+        df['Brand'][i] = 'null'
+
+
+df.Brand = df.Brand.str.upper()
+
+df = df.drop(df[(df['Brand'] == 'null')].index)
+
+
+# with open('brands.txt','w') as f:
+#     for b in df['Brand'].unique():
+#         f.write(b+'\n')
+
+
+
+
+
 grp = df['Brand'].value_counts()
 grp.plot(kind='bar')
 
@@ -19,10 +44,18 @@ grp.plot(kind='bar')
 
 
 
-# %%
 
-col_names = ['Model','Brand','Price','Odometer','Paint color','Condition','Fuel','Transmission','Type']
-str_features = ['Brand','Paint color','Condition','Fuel','Transmission','Type']
+
+
+# %%
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
+import numpy as np
 
 
 class labelEncoder:
@@ -42,19 +75,6 @@ class labelEncoder:
 
         return df
 
-    
-    
-
-
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVR
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
-
-
 def scale_df_into_XY(df,single=False):
     
     scaleX = StandardScaler()
@@ -68,8 +88,7 @@ def scale_df_into_XY(df,single=False):
     y = df.Price
     y = scaleY.fit_transform(np.array(y).reshape(-1,1))
 
-    return X,y,scaleY
-
+    return X,y,scaleX,scaleY
 
 
 
@@ -80,28 +99,34 @@ le = labelEncoder()
 le.fit(df)
 le.transform(df)
 
-X,y,scaleY = scale_df_into_XY(df)
-
-
+X,y,scaleX,scaleY = scale_df_into_XY(df)
 
 # 2015,Acura,22990.0,32917,black,good,other,other,sedan
-data = {'Model':[2015],'Brand':['Acura'],'Odometer':[32917],'Paint color':['black'],'Condition':['good'],'Fuel':['other'],'Transmission':['other'],'Type':['sedan']}
+data = {'Model':[2013],'Brand':['Chevy'],'Odometer':[142477]
+,'Paint color':['white']
+,'Condition':['good'],'Fuel':['gas']
+,'Transmission':['automatic'],'Type':['truck']}
 data = pd.DataFrame(data)
 
 
 le.transform(data)
 data
 
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
+data
+data = scaleX.transform(data)
 
 
-regressor = SVR(kernel='rbf').fit(X_train,y_train)
+# regressor = SVR(kernel='rbf').fit(X_train,y_train.reshape(-1,1))
+regressor = RandomForestRegressor(random_state=0).fit(X_train,y_train)
+ypred  = regressor.predict(X_test)
 
 ypred = regressor.predict(np.array(data))
-scaleY.inverse_transform(ypred.reshape(-1,1))
+res = scaleY.inverse_transform(ypred.reshape(-1,1))
+print(res[0][0])
 
 
+# regressor.score(X,y)
 # metrics.r2_score(y_test,ypred)
 
 
