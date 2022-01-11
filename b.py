@@ -1,6 +1,8 @@
 # %%
 from numpy.core.numerictypes import ScalarType
 import pandas as pd
+from scipy import stats
+import numpy as np
 
 
 # df = pd.read_csv('listings.csv')
@@ -17,6 +19,15 @@ df.shape
 
 # %% 
 
+def remove_outlier(df_in, col_name):
+    q1 = df_in[col_name].quantile(0.25)
+    q3 = df_in[col_name].quantile(0.75)
+    iqr = q3-q1 #Interquartile range
+    fence_low  = q1-1.5*iqr
+    fence_high = q3+1.5*iqr
+    df_out = df_in.loc[(df_in[col_name] > fence_low) & (df_in[col_name] < fence_high)]
+    return df_out
+
 def isNumber(a):
     return any(i.isdigit() for i in a)
 
@@ -28,20 +39,13 @@ for i,row in enumerate(df['Brand']):
 df.Brand = df.Brand.str.upper()
 
 df = df.drop(df[(df['Brand'] == 'null')].index)
+df = df[df.Price > 100]
 
 
-# with open('brands.txt','w') as f:
-#     for b in df['Brand'].unique():
-#         f.write(b+'\n')
+df =  remove_outlier(df,'Price')
 
 
-
-
-
-grp = df['Brand'].value_counts()
-grp.plot(kind='bar')
-
-
+# df.Price.describe()
 
 
 
@@ -52,10 +56,14 @@ grp.plot(kind='bar')
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import SGDRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import BayesianRidge
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import ElasticNet
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
+from sklearn.model_selection import cross_val_score
 import numpy as np
 import pickle
 
@@ -77,68 +85,81 @@ class labelEncoder:
 
         return df
 
-def scale_df_into_XY(df,single=False):
+def split_x_y(df):
     
-    scaleX = StandardScaler()
-    scaleY = StandardScaler()
-
-    if single:
-        return scaleX.transform(df.drop(['Price'],axis=1))
-
     X = df.drop(['Price'],axis=1)
-    X = scaleX.fit_transform(X) #scale
     y = df.Price
-    y = scaleY.fit_transform(np.array(y).reshape(-1,1))
 
-    return X,y,scaleX,scaleY
-
+    return X,y
 
 
-df = pd.read_csv('fixed.csv')
-df = df.drop('Unnamed: 0',axis=1)
 
 le = labelEncoder()
 le.fit(df)
 le.transform(df)
 
-X,y,scaleX,scaleY = scale_df_into_XY(df)
+X,y = split_x_y(df)
 
 # 2015,Acura,22990.0,32917,black,good,other,other,sedan
-data = {'Model':[1976],'Brand':['Ford'],'Odometer':[123456]
+data = {'Model':[1976],'Brand':['FORD'],'Odometer':[123456]
 ,'Paint color':['white']
 ,'Condition':['fair'],'Fuel':['gas']
 ,'Transmission':['other'],'Type':['truck']}
+
+
 data = pd.DataFrame(data)
 
 
-le.transform(data)
-data
+
+data = le.transform(data)
+
+
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
-data
-data = scaleX.transform(data)
 
 
-# regressor = SVR(kernel='rbf').fit(X_train,y_train.reshape(-1,1))
 
 
+
+svr = SVR(kernel='rbf').fit(X_train,y_train)
 regressor = RandomForestRegressor(random_state=0).fit(X_train,y_train)
-ypred  = regressor.predict(X_test)
+sgd = SGDRegressor().fit(X_train,y_train)
+en = ElasticNet().fit(X_train,y_train)
+br = BayesianRidge().fit(X_train,y_train)
+lr = LinearRegression().fit(X_train,y_train)
 
-ypred = regressor.predict(np.array(data))
-res = scaleY.inverse_transform(ypred.reshape(-1,1))
-print(res[0][0])
+param = {'n_estimators':[i for i in range(100,102)],'max_depth':[i for i in range(10)]}
+cv = GridSearchCV(regressor,param,scoring='r2')
+cv.fit(X_train,y_train)
+
+print(cv.best_params_,cv.best_score_)
+
+
+ypred_rf  = regressor.predict(X_test)
+ypred_svr  = svr.predict(X_test)
+ypred_sgd  = sgd.predict(X_test)
+ypred_en = en.predict(X_test)
+ypred_br = br.predict(X_test)
+ypred_lr = lr.predict(X_test)
+
+# ypred = regressor.predict(np.array(data))
 
 
 # pickle.dump(le,open('encoder.pkl','wb'))
-# pickle.dump(regressor,open('model.pkl','wb'))
-# pickle.dump(scaleX,open('input_scaler.pkl','wb'))
-# pickle.dump(scaleY,open('output_scaler.pkl','wb'))
+# pickle.dump(regressor,open('randomForest.pkl','wb'))
+
 
 
 
 # regressor.score(X,y)
-# metrics.r2_score(y_test,ypred)
+# print(metrics.r2_score(y_test,ypred_rf),' random forrest score')
+# print(metrics.r2_score(y_test,ypred_svr),' svr score')
+# print(metrics.r2_score(y_test,ypred_sgd),' sgd score')
+# print(metrics.r2_score(y_test,ypred_en),' elastic net score')
+# print(metrics.r2_score(y_test,ypred_br),' bayessian  score')
+# print(metrics.r2_score(y_test,ypred_lr),' linear model  score')
+
 
 
 # %%

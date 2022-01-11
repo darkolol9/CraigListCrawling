@@ -1,6 +1,7 @@
 import pickle
+from b import labelEncoder
 
 
 
-model = pickle.load(open('model.pkl','rb'))
-print(model.feature_names_in_)
+model = pickle.load(open('randomForest.pkl','rb'))
+labelEncoder = pickle.load(open('encoder.pkl','rb'))
