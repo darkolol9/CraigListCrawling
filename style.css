@@ -1,0 +1,17 @@
+h1 {
+    color: rgb(200, 200, 207);
+}
+
+body {
+    background-color: rgb(17, 45, 87);
+}
+
+#data {
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+
+#data table {
+    border: solid;
+}

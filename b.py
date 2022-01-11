@@ -1,4 +1,5 @@
 # %%
+from numpy.core.numerictypes import ScalarType
 import pandas as pd
 
 
@@ -9,9 +10,9 @@ df = pd.read_csv('listings_no_dupe.csv')
 # df['Price'] = df['Price'].str.replace('$','').astype(float)
 df.shape
 
-# df.to_csv('listings_no_dupe.csv')
+# df.to_csv('listings_no_dupe.csv',index=False)
 
-df.tail()
+# df.tail()
 
 
 # %% 
@@ -56,6 +57,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 import numpy as np
+import pickle
 
 
 class labelEncoder:
@@ -102,10 +104,10 @@ le.transform(df)
 X,y,scaleX,scaleY = scale_df_into_XY(df)
 
 # 2015,Acura,22990.0,32917,black,good,other,other,sedan
-data = {'Model':[2013],'Brand':['Chevy'],'Odometer':[142477]
+data = {'Model':[1976],'Brand':['Ford'],'Odometer':[123456]
 ,'Paint color':['white']
-,'Condition':['good'],'Fuel':['gas']
-,'Transmission':['automatic'],'Type':['truck']}
+,'Condition':['fair'],'Fuel':['gas']
+,'Transmission':['other'],'Type':['truck']}
 data = pd.DataFrame(data)
 
 
@@ -118,12 +120,21 @@ data = scaleX.transform(data)
 
 
 # regressor = SVR(kernel='rbf').fit(X_train,y_train.reshape(-1,1))
+
+
 regressor = RandomForestRegressor(random_state=0).fit(X_train,y_train)
 ypred  = regressor.predict(X_test)
 
 ypred = regressor.predict(np.array(data))
 res = scaleY.inverse_transform(ypred.reshape(-1,1))
 print(res[0][0])
+
+
+# pickle.dump(le,open('encoder.pkl','wb'))
+# pickle.dump(regressor,open('model.pkl','wb'))
+# pickle.dump(scaleX,open('input_scaler.pkl','wb'))
+# pickle.dump(scaleY,open('output_scaler.pkl','wb'))
+
 
 
 # regressor.score(X,y)
