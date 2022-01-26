@@ -9,6 +9,12 @@ import requests
 
 
 
+##############################
+# made by hs #
+#############################
+
+
+
 TOKEN = 'OTI5NDY3NDIzMzA2OTU2ODEw.Ydnv_g.GAN1pP9F_iFWIJbvtEr1Qg2ks8A'
 
 encoder = pickle.load(open('encoder.pkl','rb'))
