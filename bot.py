@@ -10,7 +10,7 @@ import requests
 
 
 ##############################
-# made by hs #
+# made by darkolol9 #
 #############################
 
 
